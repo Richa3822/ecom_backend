@@ -14,8 +14,9 @@ const createProduct = async(req,res)=>{
 const getAllProduct = async(req,res)=>{
     try {
         const allProduct = await productServiceInstance.GetAllProduct(req.query);
+        // console.log(allProduct.filterProducts);
         if(allProduct){
-            return res.status(200).json({msg : 'getting all product', products: allProduct ,nbHits: allProduct.length});
+            return res.status(200).json({msg : 'getting all product', count:allProduct.totalProducts, products: allProduct.filterProducts});
         }else{
             return res.status(400).json({msg : " no product found"});
         }

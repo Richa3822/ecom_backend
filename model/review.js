@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const moment = require('moment');
+
 const reviewSchema=new mongoose.Schema({
     productId:{
         type:String,
@@ -20,8 +22,8 @@ const reviewSchema=new mongoose.Schema({
         trim:true,
     },
     date:{
-        type:Date,
-        default: Date.now()
+        type:String,
+        default: moment().format('MMMM Do, YYYY')
     }
 })
 
