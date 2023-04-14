@@ -3,6 +3,7 @@ const userModel = require('../model/user');
 const UserService = require('../services/user');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const { SERVER_URL } = require('../constants/config');
 let userService = new UserService();
 
 let transporter = nodemailer.createTransport({
@@ -101,7 +102,7 @@ const sendMailToUser = async (req, res) => {
                 .json({ status: false, message: `no user with this email id` });
         } else {
             const token = jwt.sign({ sellerId: user._id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
-            const resetUrl = `http://localhost:3000/reset-password/${token}`;
+            const resetUrl = `${SERVER_URL}/reset-password/${token}`;
             const mailOptions = {
                 from: '19ceusf036@ddu.ac.in',
                 to: email,
