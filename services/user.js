@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
+const { SERVER_URL } = require('../constants/config');
 
 let transporter = nodemailer.createTransport({
   host: 'smtp.gmail.com',
@@ -52,7 +53,7 @@ class UserService {
             process.env.JWT_SECRET_KEY,
             { expiresIn: '1h' }
           );
-          const resetUrl = `http://localhost:3000/set-password/${token}`;
+          const resetUrl = `${SERVER_URL}set-password/${token}`;
           const mailOptions = {
             from: '19ceusf036@ddu.ac.in',
             to: userInfo.emailId,
