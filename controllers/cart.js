@@ -4,7 +4,6 @@ const { ObjectId } = require('mongodb');
 const CartService = require('../services/cart');
 const cartService = new CartService();
 
-
 async function createCart(req, res) {
   try {
     const savedCartData = await cartService.createCart(req.body);
