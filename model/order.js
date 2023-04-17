@@ -11,11 +11,9 @@ let userSchema = new mongoose.Schema({
   },
   email: { 
     type: String, 
-    required: [true, 'Must Provide email Id'] 
   },
   contactNo: { 
     type: String, 
-    required: [true, 'Must Provide Contact No'] 
   }
 });
 let addressSchema = new mongoose.Schema({
