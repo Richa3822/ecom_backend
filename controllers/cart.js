@@ -3,8 +3,7 @@ const { ObjectId } = require('mongodb');
 
 const CartService = require('../services/cart');
 const cartService = new CartService();
-const uuid = require('uuid');
-const { ObjectId } = require('mongodb');
+
 
 async function createCart(req, res) {
   try {
