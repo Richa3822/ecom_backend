@@ -3,6 +3,7 @@ const {
   getCart,
   createCart,
   deleteCart,
+  clearCart,
   updateQtyInCart,
   deleteProduct,
   addProduct,
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.post('/', createCart);
 router.get('/:userId', getCart);
+router.delete('/clearCart/:userId',clearCart)
 router.delete('/:userId', deleteCart);
 router.patch('/:userId/:productId/:variantId', updateQtyInCart);
 router.delete('/:userId/:productId/:variantId', deleteProduct);

@@ -140,6 +140,22 @@ class CartService {
     }
   }
 
+  async clearCartByUserId({userId}){
+    if (!userId) {
+      throw new Error('userId is required field');
+    }
+    const clearCart = await Cart.findOne({
+      userId
+    });
+    if (!clearCart) {
+      throw new Error('no cart data found');
+    }
+    
+    clearCart.products = []; // clear the products array
+  
+    await clearCart.save(); // save the updated cart data  
+  }
+
   async addProductInCart({ userId, product }) {
     if (!userId || !product) {
       throw new Error('Required field = userId and product');
