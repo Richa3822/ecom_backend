@@ -34,26 +34,33 @@ class OrderService {
     }
     try {
       if(!filter){
+        const count = await orderModel
+        .find({$and:[{ 'user.userId': userId },{status:{$ne:'deleted'}}]}).countDocuments();
         const orderList = await orderModel
         .find({$and:[{ 'user.userId': userId },{status:{$ne:'deleted'}}]})
         .skip(offset)
         .limit(limit)
+      
         
-        return orderList
+        
+        return [orderList,count]
       }
         if (filter === 'Last30') {
           let currentDate = moment().format("MM/DD/YYYY")
           let dateOlderThan30Days = moment().subtract(30,'days').calendar()
-          const orderList = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{$and:[{orderDate:{$gte:dateOlderThan30Days}},{orderDate:{$lte:currentDate}}]}]}).skip(offset).limit(limit)
-          return orderList
+          const count = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{$and:[{orderDate:{$gte:dateOlderThan30Days}},{orderDate:{$lte:currentDate}}]}]}).countDocuments();
+          const orderList = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{$and:[{orderDate:{$gte:dateOlderThan30Days}},{orderDate:{$lte:currentDate}}]}]}).skip(offset).limit(limit);
+          return [orderList,count]
         }
         if (filter === 'Older'){
+          const count = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{orderDate:{$lt:'2020'}}]}).countDocuments();
           const orderList = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{orderDate:{$lt:'2020'}}]}).skip(offset).limit(limit);
-          return orderList;
+          return [orderList,count];
         }
         if (filter === '2023' || filter === '2022' || filter === '2021' || filter === '2020'){
+          const count = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{orderDate:{$gte:filter+'-01-01T00:00:00.00+00:00',$lte:filter+'-12-31T23:59:59.00+00:00'}}]}).countDocuments();
           const orderList = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{orderDate:{$gte:filter+'-01-01T00:00:00.00+00:00',$lte:filter+'-12-31T23:59:59.00+00:00'}}]}).skip(offset).limit(limit);
-          return orderList;
+          return [orderList,count];
         }
       } catch (err) {
         throw err;
@@ -100,10 +107,12 @@ class OrderService {
       status,
       sellerId,
       limit = 20,
-      offset = 0
+      offset = 0,
+      search
     } = queryObject;
     limit = (+limit)
     offset = (+offset)
+    
     if (userId) {
       filterObj['user.userId'] =mongoose.Types.ObjectId(userId);
     }
@@ -116,6 +125,7 @@ class OrderService {
     if (status) {
       filterObj['status'] = status;
     }
+
     if (sellerId) {
       filterObj['products.sellerId'] =sellerId
 
@@ -127,9 +137,8 @@ class OrderService {
         $project: { totalAmount: 0 }
       });
     }
-
     pipeline.push({
-      $match: filterObj
+      $match: {$and:[filterObj,{_Id:{$regex:search,$options:"i"}}]}
     });
 
     if(filterObj.status !== 'deleted'){
@@ -138,12 +147,13 @@ class OrderService {
       });
     }
  
-
+    let filterOrders = await orderModel.aggregate(pipeline);
+    let count = filterOrders.length;
     let filterOrder = await orderModel
       .aggregate(pipeline)
       .skip(offset)
       .limit(limit);
-    return filterOrder;
+    return [filterOrder,count];
   }
   async getCounter() {
     try {
@@ -162,10 +172,13 @@ class OrderService {
   async searchOrder(queryObject){
     let {userId,search,limit=20,offset=0}= queryObject;
     try{
+      let count = await orderModel.find({$and:[{'user.userId':userId},{'products.name':
+        {$regex:search,$options:'i'}
+      }]}).countDocuments();
       let searchedOrders = await orderModel.find({$and:[{'user.userId':userId},{'products.name':
         {$regex:search,$options:'i'}
       }]}).skip(offset).limit(limit);
-      return searchedOrders;
+      return [searchedOrders,count];
     }
     catch(err){
       throw(err)
