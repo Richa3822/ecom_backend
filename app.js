@@ -10,7 +10,7 @@ const app = express();
 const port = process.env.PORT || config.SERVER_PORT;
 
 // const options = {
-//   origin: 'http://localhost:3001/'
+//   origin: SERVER_URL
 // };
 app.use(cors());
 app.use(express.static('public'));
@@ -31,6 +31,6 @@ app.use(express.json());
 
 app.use('/api', routers);
 app.listen(port, () => {
-  console.log(`server started at the port localhost:${port}`);
+  console.log(`server started at the port ${config.SERVER_URL}`);
 });
 
