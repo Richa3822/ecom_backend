@@ -70,7 +70,7 @@ const Cart = new mongoose.Schema({
   products: {
     type: [cartProduct],
     required: true,
-    validate: [val => val.length > 0, 'at least select one product']
+    // validate: [val => val.length > 0, 'at least select one product'],
   }
 });
 

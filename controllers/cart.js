@@ -55,7 +55,28 @@ async function deleteCart(req, res) {
   } catch (e) {
     res.status(500).json({
       status: false,
-      message: `Server Error, ${e.message}`
+      message: `Server Error delete, ${e.message}`
+    });
+  }
+}
+
+async function clearCart(req,res){
+  try {
+    const { userId } = req.params;
+    console.log("inside Controller userId",userId)
+
+    const clearCartData = await cartService.clearCartByUserId({userId})
+    console.log("clearCartData",clearCartData)
+
+    res.status(200).json({
+      status: true,
+      message: 'Cart cleared successfully'
+    });
+  }
+  catch(e){
+    res.status(500).json({
+      status: false,
+      message: `Server Error clearcart, ${e.message}`
     });
   }
 }
@@ -166,6 +187,7 @@ module.exports = {
   createCart,
   getCart,
   deleteCart,
+  clearCart,
   updateQtyInCart,
   deleteProduct,
   addProduct,
