@@ -172,10 +172,13 @@ class OrderService {
   async searchOrder(queryObject){
     let {userId,search,limit=20,offset=0}= queryObject;
     try{
+      let count = await orderModel.find({$and:[{'user.userId':userId},{'products.name':
+        {$regex:search,$options:'i'}
+      }]}).countDocuments();
       let searchedOrders = await orderModel.find({$and:[{'user.userId':userId},{'products.name':
         {$regex:search,$options:'i'}
       }]}).skip(offset).limit(limit);
-      return searchedOrders;
+      return [searchedOrders,count];
     }
     catch(err){
       throw(err)

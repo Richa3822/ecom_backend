@@ -115,12 +115,14 @@ const searchOrder= async(req,res)=>{
       offset: req.query.offset
     }
     let queryResult = await orderServiceInstance.searchOrder(queryObject);
+    const [searchedOrders,count]= queryResult;
+    console.log(count)
     if(queryResult )
     {
       res.status(200).json({
         message:"Orders filtered Successfully",
-        count:queryResult.length,
-        details :queryResult
+        count:count,
+        details :searchedOrders
       })
     }else{
       res.status(404).send("No orders found for specific search");
