@@ -13,11 +13,14 @@ const getOrder = async (req, res) => {
     };
     let orderList = await orderServiceInstance.getOrders(queryObject);
     if (orderList) {
+      const [paginatedOrderList,ordersCount]= orderList;
+      console.log(paginatedOrderList);
       res.status(200).json(
         {
           message:"Order Fetched Successfully",
-          count:orderList.length,
-          details:orderList
+          totalcount : ordersCount,
+          fetchedOrdersCount : paginatedOrderList.length,
+          details:paginatedOrderList
         }
       );
     } else {

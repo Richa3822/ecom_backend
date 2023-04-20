@@ -34,26 +34,33 @@ class OrderService {
     }
     try {
       if(!filter){
+        const count = await orderModel
+        .find({$and:[{ 'user.userId': userId },{status:{$ne:'deleted'}}]}).countDocuments();
         const orderList = await orderModel
         .find({$and:[{ 'user.userId': userId },{status:{$ne:'deleted'}}]})
         .skip(offset)
         .limit(limit)
+      
         
-        return orderList
+        
+        return [orderList,count]
       }
         if (filter === 'Last30') {
           let currentDate = moment().format("MM/DD/YYYY")
           let dateOlderThan30Days = moment().subtract(30,'days').calendar()
-          const orderList = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{$and:[{orderDate:{$gte:dateOlderThan30Days}},{orderDate:{$lte:currentDate}}]}]}).skip(offset).limit(limit)
-          return orderList
+          const count = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{$and:[{orderDate:{$gte:dateOlderThan30Days}},{orderDate:{$lte:currentDate}}]}]}).countDocuments();
+          const orderList = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{$and:[{orderDate:{$gte:dateOlderThan30Days}},{orderDate:{$lte:currentDate}}]}]}).skip(offset).limit(limit);
+          return [orderList,count]
         }
         if (filter === 'Older'){
+          const count = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{orderDate:{$lt:'2020'}}]}).countDocuments();
           const orderList = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{orderDate:{$lt:'2020'}}]}).skip(offset).limit(limit);
-          return orderList;
+          return [orderList,count];
         }
         if (filter === '2023' || filter === '2022' || filter === '2021' || filter === '2020'){
+          const count = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{orderDate:{$gte:filter+'-01-01T00:00:00.00+00:00',$lte:filter+'-12-31T23:59:59.00+00:00'}}]}).countDocuments();
           const orderList = await orderModel.find({$and:[{'user.userId':userId},{status:{$ne:'deleted'}},{orderDate:{$gte:filter+'-01-01T00:00:00.00+00:00',$lte:filter+'-12-31T23:59:59.00+00:00'}}]}).skip(offset).limit(limit);
-          return orderList;
+          return [orderList,count];
         }
       } catch (err) {
         throw err;
